@@ -4,9 +4,9 @@
   "display": "standalone",
   "name": "SFDG🎲",
   "orientation": "any",
-  "scope": "/",
+  "scope": "./",
   "short_name": "SFDG🎲",
-  "start_url": "/",
+  "start_url": "./",
   "theme_color": "#81023b",
   "description": "Game edukasi mitigasi kebakaran hutan."
 }
