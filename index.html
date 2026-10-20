@@ -1,0 +1,1421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Southwest Papua Wildfire Board Game - Impostor Edition</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #090d16; color: #f8fafc; }
+        .glass-panel { background: rgba(15, 23, 42, 0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.12); }
+        .pawn-p1 { background-color: #ef4444; border-color: #fca5a5; }
+        .pawn-p2 { background-color: #3b82f6; border-color: #93c5fd; }
+        .pawn-p3 { background-color: #eab308; border-color: #fef08a; }
+        .pawn-p4 { background-color: #10b981; border-color: #6ee7b7; }
+        .pawn-p5 { background-color: #a855f7; border-color: #d8b4fe; }
+        .pawn-p6 { background-color: #ec4899; border-color: #fbcfe8; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-8px); }
+            40%, 80% { transform: translateX(8px); }
+        }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-rose-500 selection:text-white">
+
+    <!-- HEADER -->
+    <header class="glass-panel sticky top-0 z-40 px-4 py-3 border-b border-slate-800 shadow-xl">
+        <div class="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-3">
+            <div class="flex items-center space-x-3">
+                <div class="p-2 bg-gradient-to-br from-rose-600 to-indigo-700 rounded-xl text-white shadow-lg">
+                    <i class="fa-solid fa-user-ninja text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-base md:text-xl font-black text-white tracking-wide flex items-center gap-2">
+                        SOUTHWEST PAPUA WILDFIRE BOARD GAME
+                        <span class="text-[10px] bg-rose-500/20 text-rose-300 border border-rose-500/40 px-2.5 py-0.5 rounded-full font-bold">IMPOSTOR EDITION</span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400">27 Main Events, 13 Plus Events (28–40), Precision Red Pins & Stacked Pawns</p>
+                </div>
+            </div>
+
+            <!-- TOP STATS -->
+            <div id="top-stats-bar" class="hidden flex items-center space-x-4 bg-slate-900/90 px-4 py-2 rounded-2xl border border-slate-700">
+                <div class="text-center">
+                    <div class="text-[9px] text-slate-400 font-bold uppercase">Environmental Health</div>
+                    <div id="stat-health" class="text-sm md:text-base font-black text-emerald-400">100%</div>
+                </div>
+                <div class="h-6 w-px bg-slate-700"></div>
+                <div class="text-center">
+                    <div class="text-[9px] text-slate-400 font-bold uppercase">Team Score</div>
+                    <div id="stat-score" class="text-sm md:text-base font-black text-amber-400">0</div>
+                </div>
+                <div class="h-6 w-px bg-slate-700"></div>
+                <div class="text-center">
+                    <div class="text-[9px] text-slate-400 font-bold uppercase">Round</div>
+                    <div id="stat-round" class="text-sm md:text-base font-black text-indigo-400">1 / 6</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTAINER -->
+    <main class="max-w-7xl w-full mx-auto p-3 md:p-6 flex-grow flex flex-col justify-center">
+
+        <!-- SETUP MODAL (4-6 PLAYERS) -->
+        <div id="modal-setup" class="w-full max-w-lg mx-auto glass-panel p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl relative my-auto">
+            <div class="text-center mb-6">
+                <div class="inline-flex p-3 bg-rose-500/10 text-rose-400 rounded-2xl border border-rose-500/30 mb-3">
+                    <i class="fa-solid fa-users-viewfinder text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-black text-white">Team Setup & Impostor Mode</h2>
+                <p class="text-xs text-slate-400 mt-1">Select 4–6 players. Random roles: Doctor, Police, Firefighter, Tribal Chief, Judge, Civilian.</p>
+            </div>
+
+            <div class="space-y-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-2">Number of Players:</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button type="button" onclick="setPlayerCount(4)" id="pbtn-4" class="py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl border border-indigo-500 shadow-md">4 Players</button>
+                        <button type="button" onclick="setPlayerCount(5)" id="pbtn-5" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm rounded-xl border border-slate-700">5 Players</button>
+                        <button type="button" onclick="setPlayerCount(6)" id="pbtn-6" class="py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm rounded-xl border border-slate-700">6 Players</button>
+                    </div>
+                </div>
+
+                <div id="player-inputs-container" class="space-y-2.5 max-h-52 overflow-y-auto pr-1"></div>
+
+                <button type="button" onclick="startGameSession()" class="w-full bg-gradient-to-r from-rose-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-extrabold py-3.5 rounded-xl text-base shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-play"></i> Start Game & Role Assignment
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN DASHBOARD -->
+        <div id="gameplay-dashboard" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-5 w-full">
+
+            <!-- LEFT CONTROL PANEL -->
+            <div class="lg:col-span-4 flex flex-col space-y-4">
+
+                <!-- CHECK ROLE -->
+                <div class="glass-panel p-3.5 rounded-2xl border border-slate-700 shadow-lg flex justify-between items-center">
+                    <div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase">Secret Role Peek</div>
+                        <div class="text-xs text-slate-300">Peek at your role & Impostor status</div>
+                    </div>
+                    <button onclick="openCheckRoleModal()" class="bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-eye"></i> Peek Role
+                    </button>
+                </div>
+
+                <!-- MOVEMENT DICE -->
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700 shadow-lg">
+                    <div class="flex justify-between items-center mb-3">
+                        <h3 class="text-xs md:text-sm font-bold text-slate-200 flex items-center gap-2">
+                            <i class="fa-solid fa-dice text-amber-400"></i> Directed Region Dice
+                        </h3>
+                        <span id="turn-indicator" class="text-[11px] font-bold text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-lg border border-amber-500/30">
+                            Turn: Player 1
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-900/90 p-3 rounded-xl border border-slate-800 mb-3 flex items-center justify-between">
+                        <div>
+                            <div class="text-[10px] text-slate-400 uppercase font-semibold">Dice Result / Position:</div>
+                            <div id="dice-result-text" class="text-sm font-black text-amber-400">-</div>
+                        </div>
+                        <div id="dice-box" class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-xl text-slate-300">
+                            <i class="fa-solid fa-dice-d6"></i>
+                        </div>
+                    </div>
+
+                    <button onclick="rollDiceCurrentPlayer()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-md">
+                        <i class="fa-solid fa-dice-three text-lg"></i> Roll Dice & Move Region
+                    </button>
+                </div>
+
+                <!-- MAIN EVENT CARD INPUT (1-27) -->
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700 shadow-lg">
+                    <h3 class="text-xs md:text-sm font-bold text-slate-200 mb-1 flex items-center gap-2">
+                        <i class="fa-solid fa-fire-extinguisher text-rose-500"></i> Main Event Cards (1–27)
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mb-3">Enter event card number.</p>
+
+                    <div class="flex gap-2">
+                        <input type="number" id="input-event-number" min="1" max="27" placeholder="Card 1-27" class="bg-slate-900 border border-slate-700 text-white font-bold text-center text-sm rounded-xl px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-rose-500">
+                        <button onclick="triggerEventByNumber()" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition whitespace-nowrap shadow-md flex items-center gap-1.5">
+                            <i class="fa-solid fa-bolt"></i> Open Event
+                        </button>
+                    </div>
+                </div>
+
+                <!-- EVENT PLUS PANEL (28-40) -->
+                <div id="panel-event-plus-trigger" class="glass-panel p-4 rounded-2xl border border-rose-500/50 bg-rose-950/20 shadow-lg relative opacity-50 pointer-events-none">
+                    <div class="flex items-center justify-between mb-1">
+                        <h3 class="text-xs font-bold text-rose-400 flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i> Plus Event Cards Area
+                        </h3>
+                        <span class="text-[9px] bg-rose-500/30 text-rose-300 px-2 py-0.5 rounded font-bold">13 Cards (28–40)</span>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mb-2">Unlocked specifically when the team makes a **WRONG DECISION**. Answer correctly to earn an Impostor Clue!</p>
+                    <div class="flex gap-2">
+                        <input type="number" id="input-event-plus-number" min="28" max="40" placeholder="Card 28-40" class="bg-slate-900 border border-slate-700 text-white font-bold text-center text-sm rounded-xl px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <button onclick="triggerEventPlusByNumber()" class="bg-amber-600 hover:bg-amber-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition whitespace-nowrap shadow-md">
+                            Open Plus
+                        </button>
+                    </div>
+                </div>
+
+                <!-- ACTIVE EVENT DISPLAY -->
+                <div id="panel-active-event" class="hidden glass-panel p-4 rounded-2xl border border-slate-700 shadow-lg flex-grow flex flex-col justify-between space-y-3">
+                    <div>
+                        <div class="flex justify-between items-center mb-2 pb-2 border-b border-slate-700">
+                            <span id="card-event-badge" class="px-2.5 py-0.5 text-[10px] font-bold rounded bg-rose-500/20 text-rose-400 border border-rose-500/30">
+                                Event Card #1
+                            </span>
+                            <span id="card-event-loc" class="text-xs font-semibold text-amber-400 flex items-center gap-1">
+                                <i class="fa-solid fa-location-dot"></i> Sorong
+                            </span>
+                        </div>
+
+                        <h3 id="card-event-title" class="text-xs md:text-sm font-bold text-amber-300 mb-2 leading-snug">Disaster Title</h3>
+
+                        <div class="space-y-2 text-[11px]">
+                            <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                <span class="font-bold text-slate-300 block mb-0.5">📖 Story:</span>
+                                <p id="card-event-story" class="text-slate-400 leading-relaxed">-</p>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                <span class="font-bold text-slate-300 block mb-0.5">💥 Impact:</span>
+                                <p id="card-event-impact" class="text-rose-300 leading-relaxed">-</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <span class="font-bold text-indigo-300 block mb-0.5">📊 Data:</span>
+                                    <p id="card-event-data" class="text-slate-400 text-[10px]">-</p>
+                                </div>
+                                <div class="bg-slate-900/80 p-2 rounded-xl border border-slate-800">
+                                    <span class="font-bold text-amber-300 block mb-0.5">💬 Opinion:</span>
+                                    <p id="card-event-opinion" class="text-slate-400 text-[10px]">-</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="dispatchNearestPionToEvent()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2.5 rounded-xl text-xs transition flex items-center justify-center gap-2 shadow-lg">
+                        <i class="fa-solid fa-person-walking-arrow-right text-base"></i> Open Decision Phase
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL: INTERACTIVE MAP & OVERLAYS -->
+            <div class="lg:col-span-8 flex flex-col space-y-4">
+
+                <!-- MAP OF SOUTHWEST PAPUA WITH PRECISION RED PINS -->
+                <div class="relative glass-panel rounded-3xl border border-slate-700 overflow-hidden shadow-2xl min-h-[460px] md:min-h-[520px] flex items-center justify-center">
+
+                    <img id="map-image" src="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=80" alt="Southwest Papua Map" class="w-full h-full object-cover min-h-[460px] filter brightness-90 contrast-105">
+
+                    <!-- CONTAINER FOR RED PINS & STACKED PAWNS -->
+                    <div id="map-pins-container" class="absolute inset-0 pointer-events-none"></div>
+
+                    <!-- CUSTOM MAP UPLOADER -->
+                    <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700 text-xs flex items-center gap-2 z-10 shadow-lg pointer-events-auto">
+                        <i class="fa-solid fa-image text-amber-400"></i>
+                        <span class="text-slate-300 font-semibold text-[11px]">Change Map Image:</span>
+                        <label class="cursor-pointer bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold px-2.5 py-1 rounded-lg transition">
+                            Choose File
+                            <input type="file" accept="image/*" class="hidden" onchange="uploadCustomMapImage(event)">
+                        </label>
+                    </div>
+
+                    <!-- MODAL DECISION PHASE -->
+                    <div id="modal-decision" class="hidden absolute inset-0 bg-slate-950/95 backdrop-blur-md z-30 p-4 md:p-6 flex flex-col justify-between pointer-events-auto">
+                        <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                            <div>
+                                <span class="text-[10px] md:text-xs font-bold text-amber-400 uppercase tracking-wider">Analysis & Decision Phase</span>
+                                <h3 class="text-xs md:text-base font-black text-white">Forest Fire Response Action Card</h3>
+                            </div>
+                            <div class="flex items-center space-x-2 bg-rose-950/90 border border-rose-800 px-3.5 py-1.5 rounded-2xl shadow-inner">
+                                <i class="fa-solid fa-stopwatch text-rose-400 text-lg animate-pulse"></i>
+                                <div>
+                                    <div class="text-[9px] text-rose-300 font-bold uppercase leading-none">Timer</div>
+                                    <div id="timer-text" class="text-base md:text-lg font-black text-rose-400 leading-none">1:30</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 my-1 flex-grow overflow-y-auto">
+                            <!-- OPTION A -->
+                            <div onclick="selectDecisionOption(0)" class="cursor-pointer bg-slate-900/90 hover:bg-slate-800 border-2 border-slate-800 hover:border-amber-500 rounded-2xl p-3 flex flex-col justify-between transition group shadow-lg">
+                                <div>
+                                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-800 text-amber-400 group-hover:bg-amber-500 group-hover:text-slate-950 transition">Option A</span>
+                                    <p id="opt-0-text" class="text-xs text-slate-300 leading-relaxed mt-2 mb-3">-</p>
+                                </div>
+                                <div class="border-t border-slate-800 pt-2">
+                                    <span class="text-[10px] font-bold text-slate-400 block mb-1">Logistics Token:</span>
+                                    <div id="opt-0-tokens" class="text-xs text-amber-300 font-bold"></div>
+                                </div>
+                            </div>
+                            <!-- OPTION B -->
+                            <div onclick="selectDecisionOption(1)" class="cursor-pointer bg-slate-900/90 hover:bg-slate-800 border-2 border-slate-800 hover:border-amber-500 rounded-2xl p-3 flex flex-col justify-between transition group shadow-lg">
+                                <div>
+                                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-800 text-amber-400 group-hover:bg-amber-500 group-hover:text-slate-950 transition">Option B</span>
+                                    <p id="opt-1-text" class="text-xs text-slate-300 leading-relaxed mt-2 mb-3">-</p>
+                                </div>
+                                <div class="border-t border-slate-800 pt-2">
+                                    <span class="text-[10px] font-bold text-slate-400 block mb-1">Logistics Token:</span>
+                                    <div id="opt-1-tokens" class="text-xs text-amber-300 font-bold"></div>
+                                </div>
+                            </div>
+                            <!-- OPTION C -->
+                            <div onclick="selectDecisionOption(2)" class="cursor-pointer bg-slate-900/90 hover:bg-slate-800 border-2 border-slate-800 hover:border-amber-500 rounded-2xl p-3 flex flex-col justify-between transition group shadow-lg">
+                                <div>
+                                    <span class="text-[10px] font-extrabold px-2 py-0.5 rounded bg-slate-800 text-amber-400 group-hover:bg-amber-500 group-hover:text-slate-950 transition">Option C</span>
+                                    <p id="opt-2-text" class="text-xs text-slate-300 leading-relaxed mt-2 mb-3">-</p>
+                                </div>
+                                <div class="border-t border-slate-800 pt-2">
+                                    <span class="text-[10px] font-bold text-slate-400 block mb-1">Logistics Token:</span>
+                                    <div id="opt-2-tokens" class="text-xs text-amber-300 font-bold"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- MODAL EVENT PLUS -->
+                    <div id="modal-event-plus" class="hidden absolute inset-0 bg-slate-950/98 backdrop-blur-md z-40 p-6 flex flex-col justify-between overflow-y-auto pointer-events-auto">
+                        <div class="border-b border-rose-800 pb-3">
+                            <span class="text-xs font-bold text-rose-400 uppercase tracking-wider">Plus Event Card</span>
+                            <h3 id="event-plus-title" class="text-base font-black text-white mt-0.5">Plus Event Question</h3>
+                        </div>
+                        <div class="my-4 space-y-4">
+                            <!-- INCORRECT ANSWER INDICATOR -->
+                            <div id="event-plus-wrong-indicator" class="hidden bg-rose-950/80 border border-rose-500 p-3 rounded-2xl text-center animate-shake">
+                                <div class="flex items-center justify-center gap-2 text-rose-400 font-black text-xs uppercase mb-1">
+                                    <i class="fa-solid fa-circle-xmark text-lg"></i> YOUR ANSWER IS INCORRECT!
+                                </div>
+                                <p id="event-plus-wrong-text" class="text-[11px] text-rose-200 leading-snug"></p>
+                            </div>
+
+                            <p id="event-plus-question" class="text-sm font-bold text-amber-300 leading-relaxed">-</p>
+                            <div class="space-y-2">
+                                <button onclick="answerEventPlus('A')" class="w-full text-left bg-slate-900 hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs text-slate-200 transition" id="ep-opt-a">A. -</button>
+                                <button onclick="answerEventPlus('B')" class="w-full text-left bg-slate-900 hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs text-slate-200 transition" id="ep-opt-b">B. -</button>
+                                <button onclick="answerEventPlus('C')" class="w-full text-left bg-slate-900 hover:bg-slate-800 border border-slate-700 p-3 rounded-xl text-xs text-slate-200 transition" id="ep-opt-c">C. -</button>
+                            </div>
+                        </div>
+                        <button onclick="closeEventPlusModal()" class="bg-slate-800 text-slate-400 text-xs py-2 rounded-xl">Cancel / Close</button>
+                    </div>
+
+                    <!-- MODAL CLUE DISPLAY -->
+                    <div id="modal-clue-display" class="hidden absolute inset-0 bg-slate-950/98 backdrop-blur-md z-50 p-6 flex flex-col justify-center items-center text-center pointer-events-auto">
+                        <div class="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 flex items-center justify-center text-3xl mb-3">
+                            <i class="fa-solid fa-key"></i>
+                        </div>
+                        <span class="text-xs font-extrabold text-amber-400 uppercase tracking-widest">IMPOSTOR CLUE UNLOCKED!</span>
+                        <div class="bg-slate-900 border border-amber-500/40 p-4 rounded-2xl max-w-md w-full my-3">
+                            <p id="clue-text-content" class="text-sm font-bold text-amber-300 leading-relaxed">"Impostor Clue..."</p>
+                        </div>
+                        <button onclick="closeClueModal()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs shadow-lg">Got it!</button>
+                    </div>
+
+                    <!-- MODAL VOTING IMPOSTOR -->
+                    <div id="modal-voting" class="hidden absolute inset-0 bg-slate-950/95 backdrop-blur-md z-40 p-6 flex flex-col justify-between pointer-events-auto">
+                        <div class="text-center">
+                            <span id="voting-round-title" class="text-xs font-bold text-rose-400 uppercase tracking-wider">Guess the Impostor Phase</span>
+                            <h3 class="text-lg font-black text-white mt-1">Who do you suspect is the IMPOSTOR?</h3>
+                        </div>
+
+                        <!-- INCORRECT GUESS INDICATOR -->
+                        <div id="voting-wrong-indicator" class="hidden my-2 bg-rose-950/90 border-2 border-rose-500 p-3 rounded-2xl text-center shadow-2xl animate-shake">
+                            <div class="inline-flex p-2 bg-rose-500/20 text-rose-400 rounded-full border border-rose-500/40 mb-1">
+                                <i class="fa-solid fa-user-xmark text-xl"></i>
+                            </div>
+                            <h4 class="text-xs font-black text-rose-400 uppercase tracking-wide">WRONG IMPOSTOR GUESS!</h4>
+                            <p id="voting-wrong-text" class="text-[11px] text-rose-200 mt-0.5 font-semibold"></p>
+                        </div>
+
+                        <div id="voting-candidates-grid" class="grid grid-cols-2 md:grid-cols-3 gap-3 my-4"></div>
+                        <div class="flex justify-center items-center">
+                            <button onclick="skipVotingRound()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold px-6 py-2.5 rounded-xl text-xs border border-slate-700 transition">Skip Voting</button>
+                        </div>
+                    </div>
+
+                    <!-- ROUND RESULT MODAL -->
+                    <div id="modal-round-result" class="hidden absolute inset-0 bg-slate-950/95 backdrop-blur-md z-40 p-6 flex flex-col justify-center items-center text-center pointer-events-auto">
+                        
+                        <!-- TIMEOUT BADGE -->
+                        <div id="timeout-result-badge" class="hidden mb-2 bg-amber-500/20 border border-amber-500/40 px-3 py-1 rounded-full text-amber-400 font-bold text-[10px] flex items-center gap-1.5 animate-bounce">
+                            <i class="fa-solid fa-clock text-rose-400"></i> TIME EXPIRED! AUTOMATICALLY MARKED INCORRECT
+                        </div>
+
+                        <div id="result-icon-box" class="w-16 h-16 rounded-full flex items-center justify-center text-3xl mb-3"></div>
+                        <h3 id="result-title" class="text-xl font-extrabold text-white mb-2">Round Evaluation</h3>
+                        <p id="result-desc" class="text-xs md:text-sm text-slate-300 max-w-md mb-4 leading-relaxed">-</p>
+
+                        <div class="flex items-center gap-6 bg-slate-900 border border-slate-800 px-6 py-3 rounded-2xl mb-4">
+                            <div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">Score Change</div>
+                                <div id="res-score-diff" class="text-base font-black text-amber-400">+0</div>
+                            </div>
+                            <div class="h-8 w-px bg-slate-800"></div>
+                            <div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase">Environmental Health</div>
+                                <div id="res-health-diff" class="text-base font-black text-emerald-400">-0%</div>
+                            </div>
+                        </div>
+
+                        <button id="btn-show-explanation" onclick="openExplanationModal()" class="mb-4 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 font-bold px-5 py-2 rounded-xl text-xs transition flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-amber-400"></i> View Answer Key Explanation
+                        </button>
+
+                        <button onclick="proceedFromRoundResult()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-2.5 rounded-xl text-xs md:text-sm shadow-lg">Next Round <i class="fa-solid fa-arrow-right"></i></button>
+                    </div>
+
+                    <!-- EDUCATIONAL EXPLANATION MODAL -->
+                    <div id="modal-explanation" class="hidden absolute inset-0 bg-slate-950/98 backdrop-blur-md z-50 p-6 flex flex-col justify-between overflow-y-auto pointer-events-auto">
+                        <div class="border-b border-amber-500/30 pb-3 flex justify-between items-center">
+                            <div class="flex items-center gap-2 text-amber-400">
+                                <i class="fa-solid fa-graduation-cap text-xl"></i>
+                                <h3 class="text-base font-black text-white">Education: Answer Key Analysis</h3>
+                            </div>
+                            <button onclick="closeExplanationModal()" class="text-slate-400 hover:text-white text-lg font-bold"><i class="fa-solid fa-xmark"></i></button>
+                        </div>
+                        <div class="my-4 space-y-3">
+                            <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl text-left">
+                                <h4 id="exp-title" class="text-xs font-bold text-amber-300 mb-1">Event Title</h4>
+                                <p id="exp-content" class="text-xs text-slate-300 leading-relaxed whitespace-pre-line">-</p>
+                            </div>
+                        </div>
+                        <button onclick="closeExplanationModal()" class="bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl shadow-md">Back & Understood</button>
+                    </div>
+
+                    <!-- GAME OVER MODAL -->
+                    <div id="modal-game-over" class="hidden absolute inset-0 bg-slate-950/98 backdrop-blur-lg z-50 p-6 flex flex-col justify-center items-center text-center pointer-events-auto">
+                        <div class="p-4 bg-amber-500/20 text-amber-400 rounded-full border border-amber-500/30 mb-3 text-4xl"><i class="fa-solid fa-trophy"></i></div>
+                        <h2 class="text-2xl font-black text-white mb-1">Game Completed!</h2>
+                        <div class="bg-slate-900 border border-slate-800 p-4 rounded-2xl w-full max-w-xs space-y-3 my-4">
+                            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Final Score:</span><span id="final-score-val" class="text-base font-black text-amber-400">0</span></div>
+                            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Environmental Health:</span><span id="final-health-val" class="text-base font-black text-emerald-400">100%</span></div>
+                            <div class="flex justify-between items-center text-xs"><span class="text-slate-400">Impostors:</span><span id="final-impostor-list" class="text-xs font-bold text-rose-400">-</span></div>
+                        </div>
+                        <button onclick="resetGameToSetup()" class="bg-indigo-600 text-white font-bold px-6 py-3 rounded-xl text-xs">Play Again</button>
+                    </div>
+
+                    <!-- CHECK ROLE MODAL -->
+                    <div id="modal-check-role" class="hidden absolute inset-0 bg-slate-950/98 backdrop-blur-md z-50 p-6 flex flex-col justify-center items-center text-center pointer-events-auto">
+                        <div class="max-w-xs w-full bg-slate-900 border border-slate-800 p-6 rounded-3xl shadow-2xl">
+                            <h3 class="text-base font-extrabold text-white mb-3">Peek Secret Role:</h3>
+                            <select id="select-role-player" onchange="displaySecretRole()" class="w-full bg-slate-800 border border-slate-700 text-amber-400 font-bold text-xs rounded-xl p-2.5 mb-4"></select>
+                            <div id="secret-role-display-box" class="hidden p-4 rounded-2xl border mb-4">
+                                <div id="secret-role-badge" class="text-xs font-black uppercase mb-1"></div>
+                                <p id="secret-role-desc" class="text-[11px] leading-relaxed text-slate-300"></p>
+                            </div>
+                            <button onclick="closeCheckRoleModal()" class="w-full bg-slate-800 text-white font-bold py-2 rounded-xl text-xs">Close</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- PLAYERS POSITIONS STATUS -->
+                <div class="glass-panel p-4 rounded-2xl border border-slate-700 shadow-lg">
+                    <h3 class="text-xs font-bold text-slate-300 uppercase tracking-wider mb-3">
+                        <i class="fa-solid fa-location-crosshairs text-amber-400 mr-1"></i> Player Positions & Roles:
+                    </h3>
+                    <div id="players-status-grid" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-2.5"></div>
+                </div>
+
+                <!-- LOG FEED -->
+                <div class="glass-panel p-3 rounded-2xl border border-slate-700 text-xs">
+                    <div class="font-bold text-slate-400 uppercase text-[10px] mb-1">📜 Simulation Log Feed:</div>
+                    <div id="activity-log" class="h-16 overflow-y-auto space-y-1 text-[11px] text-slate-300 font-mono">
+                        <p class="text-slate-500">[System] Game ready to start.</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="glass-panel text-center py-2 border-t border-slate-800 text-[11px] text-slate-400">
+        Southwest Papua Wildfire Board Game (Impostor Edition) &copy; 2026
+    </footer>
+
+    <!-- SCRIPT GAMELOGIC -->
+    <script>
+        // REGION NODES ACCORDING TO PRECISION RED PINS ON MAP
+        const REGION_NODES = {
+            rajaampat: { id: "rajaampat", name: "Raja Ampat Regency", x: 20, y: 19, connections: ["sorong", "tambrauw"] },
+            sorong:    { id: "sorong",    name: "Sorong City", x: 28, y: 29, connections: ["rajaampat", "kabsorong", "tambrauw"] },
+            kabsorong: { id: "kabsorong", name: "Sorong Regency", x: 33, y: 40, connections: ["sorong", "sorsel", "maybrat"] },
+            tambrauw:  { id: "tambrauw",  name: "Tambrauw", x: 46, y: 25, connections: ["rajaampat", "sorong", "maybrat"] },
+            maybrat:   { id: "maybrat",   name: "Maybrat", x: 48, y: 39, connections: ["kabsorong", "tambrauw", "sorsel"] },
+            sorsel:    { id: "sorsel",    name: "South Sorong", x: 41, y: 47, connections: ["kabsorong", "maybrat"] }
+        };
+
+        const REGION_LOCATIONS = [
+            { id: "sorong", name: "Sorong City", x: 28, y: 29 },
+            { id: "kabsorong", name: "Sorong Regency", x: 33, y: 40 },
+            { id: "tambrauw", name: "Tambrauw", x: 46, y: 25 },
+            { id: "maybrat", name: "Maybrat", x: 48, y: 39 },
+            { id: "sorsel", name: "South Sorong", x: 41, y: 47 },
+            { id: "rajaampat", name: "Raja Ampat Regency", x: 20, y: 19 }
+        ];
+
+        const ROLE_LIST = ["Doctor", "Police", "Firefighter", "Tribal Chief", "Judge", "Civilian"];
+
+        const CLUE_DATABASE = {
+            "Doctor": ["Hippocratic Oath", "Sterile", "First Aid"],
+            "Police": ["Investigation", "Crime Scene", "Pistol"],
+            "Firefighter": ["Water", "Hose", "Hydrant"],
+            "Tribal Chief": ["Village", "Clan", "Deliberation"],
+            "Judge": ["Consensus Gavel", "Verdict", "Robe"],
+            "Civilian": ["Home", "Resident", "Domicile"]
+        };
+
+        // 27 MAIN EVENT CARDS
+        const EVENT_CARDS_DATABASE = [
+            {
+                id: 1, locId: "sorong", title: "Sparks on Sorong Protected Forest Slope",
+                story: "Burning household trash at the edge of the residential boundary spreads to dry forest litter in the protected forest due to strong dry-season winds.",
+                impact: "Thick smoke impairs visibility on the main Sorong–Aimas arterial road; threatens the city's water catchment area.",
+                data: "Wind speeds reach 28 knots, accelerating fire spread across dry leaf litter.",
+                opinion: "Residents suspect this is caused by a road widening project carelessly dumping vegetation debris.",
+                options: [
+                    { text: "Mobilize all nearby residents to manually form a water bucket relay brigade at the trash fire spot.", correct: false, token: "Water & Energy" },
+                    { text: "Deploy fire engines and temporarily close the affected Sorong–Aimas arterial road section.", correct: true, token: "Energy & Food" },
+                    { text: "Focus purely on direct suppression using high-pressure water hoses along the main road line.", correct: false, token: "Food & Water" }
+                ],
+                explanation: "Correct Choice Reason: Secures traffic safety against hazardous visibility while rapidly extinguishing the primary fire source inside the forest.\n\nDistractor 1: Manual relays are ineffective and expose citizens to grave danger under 28-knot winds.\n\nDistractor 2: Addresses visual smoke along the road but leaves the ignition core inside the protected forest spreading."
+            },
+            {
+                id: 2, locId: "kabsorong", title: "Klamono Dry Peatland Fire",
+                story: "Peatland drought caused by El Niño coupled with careless cigarette disposal ignites deep ground peat.",
+                impact: "The fire threatens Pertamina's oil pipelines in Klamono, posing a major risk of explosion.",
+                data: "Pertamina's pipeline pressure dropped by 15 PSI due to local overheating.",
+                opinion: "Coffee shop rumors claim this is internal sabotage by protesters over land compensation.",
+                options: [
+                    { text: "Ignore the small peat fire spots to focus solely on re-pumping oil pipeline pressure.", correct: false, token: "Water & Energy" },
+                    { text: "Deploy an internal investigation team and security personnel to interrogate all Pertamina employees.", correct: false, token: "Medicine & Water" },
+                    { text: "Coordinate with Pertamina to shut valves on affected pipeline sections and apply chemical foam cooling.", correct: true, token: "Energy & Food" }
+                ],
+                explanation: "Correct Choice Reason: Technically prevents pipeline explosions using specialized chemical foam cooling.\n\nDistractor 1: Gets distracted by local rumors while ignoring the physical threat of pipeline explosion.\n\nDistractor 2: Focuses purely on pressure indicators (PSI) while ignoring ground peat heat."
+            },
+            {
+                id: 3, locId: "kabsorong", title: "Secondary Crop Land Clearing in Seget",
+                story: "Uncontrolled land clearing sparks fires across coastal agricultural vegetation.",
+                impact: "5 hectares of coastal buffer vegetation destroyed, triggering a community emergency response.",
+                data: "5 hectares of secondary mangrove destroyed by flames.",
+                opinion: "Local youth claim investors intentionally burned the area to expedite land-use conversion permits.",
+                options: [
+                    { text: "Support community response by sending portable firefighting equipment and food rations.", correct: true, token: "Food & Energy" },
+                    { text: "Summon and interrogate local plantation investors over intentional arson allegations.", correct: false, token: "Medicine & Water" },
+                    { text: "Mobilize villagers to clear additional crop land on the opposite side to isolate the fire.", correct: false, token: "Medicine & Energy" }
+                ],
+                explanation: "Correct Choice Reason: Supplies immediate field support needed by volunteers and maintains physical stamina.\n\nDistractor 1: Focuses on legal action based on speculative rumors while the fire is actively burning.\n\nDistractor 2: Clearing new land while fires burn adds dry fuel to the area."
+            },
+            {
+                id: 4, locId: "kabsorong", title: "Hot Forest Corridor in Salawati",
+                story: "Seasonal swamp forest drying up during El Niño experiences severe subsurface ground fires.",
+                impact: "Dense smoke blankets the narrow shipping channel between Salawati Island and the Sorong mainland.",
+                data: "Underground peat temperature reaches 65°C (ground fire).",
+                opinion: "Fishermen suspect the thick smoke is from secret military weapons testing rather than forest fires.",
+                options: [
+                    { text: "Deploy amphibious excavators to dig wet barrier canals and sever subsurface fire lines.", correct: false, token: "Energy" },
+                    { text: "Coordinate with naval authorities to halt secret military exercises in the channel.", correct: true, token: "Energy" },
+                    { text: "Extensively spray surface swamp water with high-pressure pumps from boats.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Amphibious excavators penetrate muddy swamps to cut off underground peat fire paths.\n\nDistractor 1: Military exercise rumors are false myths.\n\nDistractor 2: Surface spraying cannot reach burning embers inside deep peat layers."
+            },
+            {
+                id: 5, locId: "sorong", title: "Campfire Embers at Makbon Border",
+                story: "An unextinguished campfire left overnight catches dry scrub near the village perimeter.",
+                impact: "Panicked nocturnal wildlife migrates toward residential settlements.",
+                data: "40 nocturnal animals migrate within a 500-meter radius of the village.",
+                opinion: "Village elders view the animal migration as a bad omen caused by traditional taboos being broken.",
+                options: [
+                    { text: "Conduct a sweep to extinguish smoldering embers in production forest and secure village borders.", correct: true, token: "Energy & Water" },
+                    { text: "Perform a traditional village cleansing ritual with elders to ward off bad omens.", correct: false, token: "Energy" },
+                    { text: "Capture the 40 migrating animals and quarantine them at the village hall.", correct: false, token: "Food" }
+                ],
+                explanation: "Correct Choice Reason: Addresses the fire source (remaining embers) while mitigating human-wildlife conflict.\n\nDistractor 1: Respects tradition but fails to extinguish active embers.\n\nDistractor 2: Treats the symptom without resolving the root fire cause."
+            },
+            {
+                id: 6, locId: "tambrauw", title: "Kebar Valley Karst Fire",
+                story: "Kebar savanna grassland catches fire due to unattended embers and strong valley wind gusts.",
+                impact: "Endemic Kebar grass habitat threatened; smog trapped inside the mountain valley basin.",
+                data: "Air humidity drops sharply to 32% due to El Niño.",
+                opinion: "Local ranchers accuse the livestock department of deliberately burning savanna to kill pests.",
+                options: [
+                    { text: "Evacuate all cattle to karst mountain peaks to avoid smoke inhalation.", correct: false, token: "Water & Energy" },
+                    { text: "Map tick populations and distribute free pest medicine to local livestock farmers.", correct: false, token: "Food" },
+                    { text: "Construct firebreaks around the Kebar grass savanna zone and spray water mist along wind corridors.", correct: true, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Protects endemic Kebar grass while slowing down wildfire propagation.\n\nDistractor 1: Responds to rancher accusations without fighting the savanna fire.\n\nDistractor 2: Steep karst terrain endangers livestock safety."
+            },
+            {
+                id: 7, locId: "tambrauw", title: "Vogelkop Bowerbird Nest Threat",
+                story: "Underbrush fire creeps toward the display area of the Vogelkop Bowerbird (Burung Pintar).",
+                impact: "Local ecotourism groups and indigenous rangers rush to build emergency firebreaks.",
+                data: "Rangers rapidly construct a 1.2-kilometer manual firebreak.",
+                opinion: "Ecotourism community accuses foreign researchers of carelessness leading to ignition.",
+                options: [
+                    { text: "Freeze research permits for all foreign researchers in Senopi District.", correct: false, token: "Energy" },
+                    { text: "Fund indigenous ranger emergency efforts to manually construct firebreaks to protect bird habitats.", correct: true, token: "Energy" },
+                    { text: "Relocate Bowerbird nests to artificial conservation facilities outside the forest.", correct: false, token: "Energy & Food" }
+                ],
+                explanation: "Correct Choice Reason: Reinforces physical firebreak construction by indigenous rangers (1.2 km).\n\nDistractor 1: Gets caught up in ecotourism group allegations.\n\nDistractor 2: Bowerbird nests cannot be physically moved without destruction."
+            },
+            {
+                id: 8, locId: "tambrauw", title: "Isolated Logging Track in Fef",
+                story: "Residual timber waste along an old logging road spontaneously combusts due to heat and friction.",
+                impact: "Inter-district logistics route temporarily cut off by fallen burning trees.",
+                data: "3 wooden bridges paralyzed due to extreme heat exposure.",
+                opinion: "Logging company claims steel cables snapped due to volcanic lightning strikes.",
+                options: [
+                    { text: "Burn all remaining timber waste along the track to clear it completely.", correct: false, token: "Energy & Food" },
+                    { text: "Wait for BMKG weather personnel to confirm lightning existence before extinguishing fire.", correct: false, token: "Energy, Food" },
+                    { text: "Clear timber debris along the overland track and construct emergency bypass bridges.", correct: true, token: "Water, Food" }
+                ],
+                explanation: "Correct Choice Reason: Resolves logistics route blockage and restores 3 damaged bridge crossings.\n\nDistractor 1: Waiting for weather verification delays emergency response.\n\nDistractor 2: Burning remaining timber waste severely worsens forest destruction."
+            },
+            {
+                id: 9, locId: "tambrauw", title: "Abun Leatherback Turtle Beach Fire",
+                story: "Coconut plantation clearing fires spread to beach vegetation sheltering nesting leatherback turtles.",
+                impact: "Sand temperature rises, endangering egg hatching ratios for leatherback turtles.",
+                data: "Beach sand temperature rises 4°C above normal egg incubation thresholds.",
+                opinion: "Residents blame night-fishing boat crews for lighting campfires too close to shore.",
+                options: [
+                    { text: "Douse turtle nesting zones with water to lower sand temperature and extinguish coastal fires.", correct: true, token: "Water & Energy" },
+                    { text: "Ban all night-fishing lift net boats from operating in coastal waters.", correct: false, token: "Food & Energy" },
+                    { text: "Excavate all turtle eggs and transfer them to artificial incubators.", correct: false, token: "Food & Water" }
+                ],
+                explanation: "Correct Choice Reason: Reduces sand temperature threatening turtle eggs while dousing coastal fires.\n\nDistractor 1: Blames fishermen without addressing critical sand heat levels.\n\nDistractor 2: Mass excavation carries extreme risks of embryo damage."
+            },
+            {
+                id: 10, locId: "tambrauw", title: "Tambrauw Sago Forest Fire",
+                story: "Sago palm forest cleared and burned forcibly, igniting widespread fires.",
+                impact: "Destruction of local sago groves, the primary staple food source for villagers.",
+                data: "12 productive sago groves completely destroyed.",
+                opinion: "Rumors suggest land was deliberately cleared for transmigrant food projects.",
+                options: [
+                    { text: "Dispatch emergency food supplies to affected villagers and isolate remaining sago groves.", correct: true, token: "Food & Energy" },
+                    { text: "Temporarily halt all national infrastructure projects across Papua.", correct: false, token: "Water & Food" },
+                    { text: "Replace burned sago plants with irrigated rice crops immediately.", correct: false, token: "Energy & Water" }
+                ],
+                explanation: "Correct Choice Reason: Mitigates food security crisis resulting from 12 destroyed sago groves.\n\nDistractor 1: Extreme bureaucratic response driven by speculative rumors.\n\nDistractor 2: Mismatched with local diet and swamp ecosystems."
+            },
+            {
+                id: 11, locId: "maybrat", title: "Smoke at Ayamaru Lake Shore",
+                story: "Dry reeds along the receding lake shore burned, spreading fire into lakeside forests.",
+                impact: "Lake water quality drops; endemic Boeseman's Rainbowfish (Melanotaenia boesemani) habitat disturbed.",
+                data: "Lake water level drops 1.8 meters below normal.",
+                opinion: "Rumors claim endemic rainbowfish were deliberately poisoned to cover boundary conflicts.",
+                options: [
+                    { text: "Extinguish lakeside reed fires and install ash filter screens at water inlets.", correct: true, token: "Water & Energy" },
+                    { text: "Arrest individuals accused of poisoning fish based on boundary dispute rumors.", correct: false, token: "Food" },
+                    { text: "Drain remaining lake water to clean bottom mud deposits.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Stops ash contamination destroying endemic rainbowfish habitats.\n\nDistractor 1: Misled by unfounded resident rumors.\n\nDistractor 2: Illogical when lake levels are already down 1.8 meters."
+            },
+            {
+                id: 12, locId: "maybrat", title: "Ayawasi Customary Firebreak",
+                story: "Customary forest nearly ignited from neighboring farms, but customary law enforces sanctions & response.",
+                impact: "Primary forest destruction successfully prevented through indigenous community readiness.",
+                data: "Fire extinguished in less than 3 hours by indigenous response team.",
+                opinion: "Residents claim quick response proves customary law is far more effective than government.",
+                options: [
+                    { text: "Take over management of Ayawasi customary forest under district administration.", correct: false, token: "Energy" },
+                    { text: "Provide recognition and supplementary firefighting equipment to strengthen customary teams.", correct: true, token: "Energy" },
+                    { text: "Impose heavy cash fines on farm owners without customary trial procedures.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Empowers proven local indigenous mitigation practices.\n\nDistractor 1: Undermines effective local customary governance.\n\nDistractor 2: Sparks inter-village social conflicts."
+            },
+            {
+                id: 13, locId: "maybrat", title: "Land Dispute Leading to Embers in Aitinyo",
+                story: "Individuals set fire to brush along clan boundary lines to stake land claims.",
+                impact: "Inter-clan social conflict escalates alongside rising smog levels.",
+                data: "Inter-clan disputes surge sharply by 40%.",
+                opinion: "District officials claim thick smoke is merely leftover agricultural straw burning.",
+                options: [
+                    { text: "Deploy firefighters to douse brush fires and facilitate customary leader mediation.", correct: true, token: "Energy" },
+                    { text: "Let fires burn so disputed land clears completely to reveal boundary markers.", correct: false, token: "Energy" },
+                    { text: "Confirm district official claims that smoke is just ordinary straw fire.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Fights active fire while resolving underlying social dispute (40% surge).\n\nDistractor 1: Worsens forest destruction and deepens clan hostility.\n\nDistractor 2: Passive acceptance of bureaucratic minimization."
+            },
+            {
+                id: 14, locId: "maybrat", title: "Mare Water Pipeline Fire",
+                story: "Brush fire consumes PVC clean water pipelines running from mountain springs to villages.",
+                impact: "Three villages suffer acute clean water shortages during pipeline repair.",
+                data: "450 meters of clean water PVC pipeline melted and destroyed.",
+                opinion: "Villagers believe pipeline was damaged by minor earthquake tremors.",
+                options: [
+                    { text: "Dispatch geology team to measure earthquake magnitude levels.", correct: false, token: "Water & Energy" },
+                    { text: "Distribute emergency water tanker supplies to 3 villages and replace PVC pipelines.", correct: true, token: "Energy" },
+                    { text: "Splice melted pipes using temporary swamp bamboo poles.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Resolves acute water shortage and restores 450 meters of pipeline.\n\nDistractor 1: Misguided investigation based on false earthquake assumptions.\n\nDistractor 2: Fragile makeshift fix that will fail quickly."
+            },
+            {
+                id: 15, locId: "sorsel", title: "Teminabuan Peat Swamp Embers",
+                story: "Extended dry season lowers peat water tables, triggering deep underground peat fires.",
+                impact: "Sulfurous smoke lingers for weeks; requires deep soil water injection.",
+                data: "Peat fire smolders at depths down to 1.5 meters underground.",
+                opinion: "Investigators suspect land was intentionally neglected to open illegal palm oil fields.",
+                options: [
+                    { text: "Revoke all palm oil plantation permits across South Sorong Regency.", correct: false, token: "Water & Energy" },
+                    { text: "Continuously spray upper peat surface layer from helicopters.", correct: false, token: "Energy" },
+                    { text: "Use peat injection spears (sumur pasak) to pump water 1.5 meters deep underground.", correct: true, token: "Water & Food" }
+                ],
+                explanation: "Correct Choice Reason: Technically effective method for extinguishing peat fires at 1.5m depth.\n\nDistractor 1: Helicopter surface spraying cannot penetrate deep peat.\n\nDistractor 2: Administrative decision that leaves underground fires smoldering."
+            },
+            {
+                id: 16, locId: "sorsel", title: "Sago Forest Fire & Food Crisis",
+                story: "Wild sago forests providing local staple food threatened by spreading ground fire.",
+                impact: "Village food security threatened if productive sago palms are destroyed.",
+                data: "Staple food reserve (sago starch) sufficient for only 7 remaining days.",
+                opinion: "Local rumors suggest fires were set due to market competition between sago traders.",
+                options: [
+                    { text: "Prioritize firefighting around sago forest perimeters and distribute emergency food reserves.", correct: true, token: "Food & Energy" },
+                    { text: "Gather traditional sago collectors to negotiate standardized sago starch prices.", correct: false, token: "Energy" },
+                    { text: "Harvest all sago trees simultaneously in one day before fire reaches them.", correct: false, token: "Energy, Water, Food" }
+                ],
+                explanation: "Correct Choice Reason: Secures food security amidst emergency (7 days remaining supply).\n\nDistractor 1: Focuses on commercial pricing while forest burns.\n\nDistractor 2: Destroys natural sago forest regeneration capability."
+            },
+            {
+                id: 17, locId: "sorsel", title: "Kokoda Mangrove Forest Fire",
+                story: "Piles of mangrove and nipa leaves catch fire from traditional charcoal burning activities.",
+                impact: "River mouth embankment erosion and destruction of mangrove crab spawning zones.",
+                data: "River mouth shoreline eroded by 2.3 meters due to mangrove mortality.",
+                opinion: "Charcoal makers deny responsibility, claiming mangroves died from upstream pollution.",
+                options: [
+                    { text: "Shut down upstream industrial factories accused of river pollution.", correct: false, token: "Energy & Water" },
+                    { text: "Extinguish river mouth fires and initiate mangrove seedling replanting (reforestation).", correct: true, token: "Energy" },
+                    { text: "Construct concrete sea wall breakwaters along the entire coastline.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Tackles charcoal fire source and combats 2.3m shoreline erosion.\n\nDistractor 1: Duped by deflection excuses from charcoal burners.\n\nDistractor 2: Costly structural solution that ruins crab spawning habitats."
+            },
+            {
+                id: 18, locId: "sorsel", title: "Kais River Channel Isolated by Dense Smoke",
+                story: "Riverbank forest fires engulf longboat navigation channels with near-zero visibility.",
+                impact: "Essential food supply lines to inland districts completely halted for 2 days.",
+                data: "Visibility drops below 3 meters, paralyzing 12 longboat supply transports.",
+                opinion: "Locals initially mistook the dense smog for harmless water vapor fog.",
+                options: [
+                    { text: "Extinguish riverbank vegetation using floating pumps and set up navigation lighting.", correct: true, token: "Energy & Food" },
+                    { text: "Allow longboat crews to navigate through smog at high speeds.", correct: false, token: "Energy" },
+                    { text: "Advise residents to stay indoors assuming it is harmless morning fog.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Floating pumps effectively extinguish riverbanks, restoring <3m visibility.\n\nDistractor 1: Extremely hazardous to river navigation safety.\n\nDistractor 2: Accepts false resident assumptions."
+            },
+            {
+                id: 19, locId: "sorsel", title: "Kalitami Boatmaking Fire",
+                story: "Log steaming fires used for traditional boatbuilding left unattended, spreading to wood shavings.",
+                impact: "Large ironwood trees (Intsia / Kayu Besi) catch fire and burn.",
+                data: "4 large ironwood trees over 80 cm in diameter scorched.",
+                opinion: "Craftsmen blame fires on discarded cigarettes from illegal agarwood harvesters.",
+                options: [
+                    { text: "Launch major crackdown against illegal agarwood harvesters across the forest.", correct: false, token: "Energy" },
+                    { text: "Douse wood shaving fires and mentor craftsmen on safe wood steaming techniques.", correct: true, token: "Energy" },
+                    { text: "Completely ban traditional boatbuilding across South Sorong.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Halts destruction of ancient ironwood trees (>80cm) and educates artisans.\n\nDistractor 1: Duped by craftsman scapegoating.\n\nDistractor 2: Destroys traditional livelihoods and local culture."
+            },
+            {
+                id: 20, locId: "rajaampat", title: "Embers on Waigeo Karst Island",
+                story: "Thin dry soil layer over limestone easily ignites. Endemic trees and Red Bird-of-Paradise nests threatened.",
+                impact: "Steep rocky terrain inaccessible by land; suppression possible only from sea.",
+                data: "Steep 65-degree cliff gradient prevents ground crew access.",
+                opinion: "Tour guides suspect discarded cigarette butts from reckless tourists.",
+                options: [
+                    { text: "Deploy coastal patrol firefighting vessels equipped with high-pressure water monitors.", correct: true, token: "Water & Energy" },
+                    { text: "Force firefighting crews to climb 65-degree karst cliffs without safety ropes.", correct: false, token: "Water, Energy, Food" },
+                    { text: "Close all tourist attractions across Raja Ampat to search for tourists.", correct: false, token: "Water & Medicine" }
+                ],
+                explanation: "Correct Choice Reason: Adapts strategy to the steep 65-degree cliff terrain data.\n\nDistractor 1: Endangers firefighter lives recklessly.\n\nDistractor 2: Overly punitive response focused on culprit hunting."
+            },
+            {
+                id: 21, locId: "rajaampat", title: "Wayag Peak Savanna Fire",
+                story: "Dry hilltop scrub catches fire, scorching iconic Wayag hilltop landscapes.",
+                impact: "Savanna grasses and hilltop vegetation burned black.",
+                data: "300 square meters of endemic hilltop grass charred black.",
+                opinion: "Conspiracy theory claims hill was burned to force mining permit approvals.",
+                options: [
+                    { text: "Mobilize conservation crew with portable pumps and restrict visitor capacity.", correct: true, token: "Water & Energy" },
+                    { text: "Launch investigation into mining permit conspiracy allegations.", correct: false, token: "Water & Food" },
+                    { text: "Repaint charred grass green with artificial paint.", correct: false, token: "Food & Water" }
+                ],
+                explanation: "Correct Choice Reason: Preserves remaining endemic hilltop grasses effectively.\n\nDistractor 1: Chases unverified conspiracy theories.\n\nDistractor 2: Cosmetic gimmick that further damages ecology."
+            },
+            {
+                id: 22, locId: "rajaampat", title: "Batanta Coconut Farm Fire",
+                story: "Coconut husk smoke lit to repel mosquitoes spreads up dry hill slopes.",
+                impact: "Batanta Waterfall turns muddy and polluted from erosion ash runoff.",
+                data: "Waterfall turbidity spikes up to 120 NTU.",
+                opinion: "Coastal residents blame oil palm plantations on neighboring islands.",
+                options: [
+                    { text: "Pour mass chemical water clarifiers into upstream waterfall channels.", correct: false, token: "Water & Energy" },
+                    { text: "Send formal protest letters demanding damages from oil palm companies.", correct: false, token: "Medicine & Water" },
+                    { text: "Extinguish slope fires and build ash erosion sediment barriers.", correct: true, token: "Water & Energy" }
+                ],
+                explanation: "Correct Choice Reason: Removes fire source and mitigates water turbidity (120 NTU).\n\nDistractor 1: Influenced by false coastal resident accusations.\n\nDistractor 2: Risks poisoning pristine natural stream ecosystems."
+            },
+            {
+                id: 23, locId: "rajaampat", title: "Misool Island Conservation Emergency",
+                story: "Coastal fire approaches forest ranger station and adjacent mangrove zones.",
+                impact: "Marine ranger anti-illegal fishing patrols reduced drastically by 65%.",
+                opinion: "Fishermen suspect blast fishermen lit forest fires as a distraction.",
+                options: [
+                    { text: "Dispatch specialized land firefighting unit so marine rangers can resume sea patrols.", correct: true, token: "Energy & Water" },
+                    { text: "Abandon ranger station to burn while forcing crew onto sea patrols.", correct: false, token: "Energy" },
+                    { text: "Enclose entire Misool coastline with barbed wire fencing.", correct: false, token: "Medicine & Energy" }
+                ],
+                explanation: "Correct Choice Reason: Restores marine patrol capacity (65%) while safeguarding land station.\n\nDistractor 1: Sacrifices land base and mangrove ecosystems.\n\nDistractor 2: Restricts access without fighting fires."
+            },
+            {
+                id: 24, locId: "rajaampat", title: "Hotspots in West Waigeo Nature Reserve",
+                story: "Dry weather and friction between dry bamboo stalks ignites wild fires.",
+                impact: "Fire damages habitats of endemic Waigeo frogs and rare orchids.",
+                data: "Rare Waigeo frog species facing habitat loss.",
+                opinion: "Residents consider bamboo friction explanations as climate crisis excuses.",
+                options: [
+                    { text: "Hold global climate protest rallies in the city.", correct: false, token: "Energy & Water" },
+                    { text: "Thin dry bamboo thickets and spray water mist across frog habitats.", correct: true, token: "Water & Medicine" },
+                    { text: "Clear all rare orchid plants to preserve them in city museums.", correct: false, token: "Water & Energy" }
+                ],
+                explanation: "Correct Choice Reason: Eliminates natural trigger (bamboo friction) and protects endangered fauna.\n\nDistractor 1: Gets bogged down in resident opinion debates.\n\nDistractor 2: Destroys native species' natural habitat."
+            },
+            {
+                id: 25, locId: "kabsorong", title: "Drone Patrol Hindered by Smoke in Eastern Indonesia",
+                story: "Thermal drone detects 4 new hotspots, but dense smoke hampers optical mapping.",
+                impact: "Rapid response teams must navigate dense jungle using land compasses.",
+                data: "Drone thermal cameras hindered by thick smoke blanket.",
+                opinion: "Field crew suspects hotspots are SOS signals from lost hikers.",
+                options: [
+                    { text: "Combine manual ground compass navigation with infrared thermal drone sensors.", correct: true, token: "Energy" },
+                    { text: "Convert firefighting mission into a hiker search-and-rescue operation.", correct: false, token: "Energy" },
+                    { text: "Fly drone lower between jungle tree canopy gaps.", correct: false, token: "Energy" }
+                ],
+                explanation: "Correct Choice Reason: Overcomes optical camera limitations to guide crews to 4 hotspots.\n\nDistractor 1: Distracted by unverified assumptions.\n\nDistractor 2: Risks crashing drone equipment."
+            },
+            {
+                id: 26, locId: "maybrat", title: "Water Bombing Operation on Maybrat–Tambrauw Border",
+                story: "Fire spreads in roadless valley. BNPB helicopter water bombing deployed.",
+                impact: "Aviation fuel logistics and Sorong airbase coordination tested to maximum limit.",
+                data: "Helicopter fuel consumption surges to 300 liters per hour.",
+                opinion: "Locals rumor water bombing selectively prioritizes corporate concessions.",
+                options: [
+                    { text: "Optimize flight routes from nearest lakes and maintain public transparency.", correct: true, token: "Water & Energy" },
+                    { text: "Halt helicopter operations and order villagers to hike through valley.", correct: false, token: "Energy" },
+                    { text: "Dump water over residential villages to prove helicopters are working.", correct: false, token: "Water" }
+                ],
+                explanation: "Correct Choice Reason: Sourcing water from nearest lakes efficiently is optimal aviation technique.\n\nDistractor 1: Ordering villagers to march into burning valleys is dangerous.\n\nDistractor 2: Wastes water uselessly."
+            },
+            {
+                id: 27, locId: "sorsel", title: "Southwest Papua Command & Operations Center",
+                story: "Hotspots reduced by 80% thanks to integrated command post coordination.",
+                impact: "Final evaluation of wildfire response operations.",
+                data: "Emergency response efficiency increased by 80%.",
+                opinion: "Public appreciates swift task force actions.",
+                options: [
+                    { text: "Establish Permanent Recovery Task Force & local early warning system.", correct: true, token: "Energy & Food" },
+                    { text: "Disband all firefighting crews and declare problem solved permanently.", correct: false, token: "Energy" },
+                    { text: "Spend remaining budget on media celebration parties.", correct: false, token: "Food" }
+                ],
+                explanation: "Correct Choice Reason: Institutionalizes long-term post-disaster recovery.\n\nDistractor 1: Disbanding teams creates immediate vulnerability.\n\nDistractor 2: Squanders public resources without real action."
+            }
+        ];
+
+        // 13 PLUS EVENT CARDS (IDs 28 to 40)
+        const EVENT_PLUS_DATABASE = [
+            { id: 28, title: "Meaning of Sasi Custom", q: "What is the literal meaning of the “Sasi” custom in Maluku & Papua?", opts: { A: "Periodical prohibition on harvesting natural resources.", B: "Harvest festival celebration.", C: "Prohibition without permission." }, correct: "A", exp: "Sasi is a traditional periodic resource harvesting restriction." },
+            { id: 29, title: "Sasi Procession", q: "What is the name of the procession when Sasi rules are officially enforced?", opts: { A: "Open Sasi (Buka Sasi)", B: "Close Sasi (Tutup Sasi)", C: "Open-Close Sasi" }, correct: "B", exp: "Close Sasi (Tutup Sasi) initiates the prohibition period." },
+            { id: 30, title: "Sasi & Wildfires", q: "How does Sasi help prevent forest fires?", opts: { A: "By cutting down trees.", B: "By pumping oil.", C: "By prohibiting open fires & restricting forest activity." }, correct: "C", exp: "Restricts open flame usage in dry forest areas." },
+            { id: 31, title: "El Niño", q: "What is the climate phenomenon causing extended droughts called?", opts: { A: "El Niño", B: "La Niña", C: "El Niña" }, correct: "A", exp: "El Niño triggers extreme dry spells." },
+            { id: 32, title: "Kewang Institution", q: "What is the role of the traditional Kewang institution?", opts: { A: "Harvest crop buyer", B: "Scientific researcher", C: "Traditional supervisor of Sasi laws" }, correct: "C", exp: "Acts as traditional customary environmental police." },
+            { id: 33, title: "Water Source Sasi", q: "What is the main function of Water Source Sasi?", opts: { A: "Preserve clean water supplies.", B: "Seal water springs with concrete.", C: "Drain water bodies." }, correct: "A", exp: "Protects water spring catchments." },
+            { id: 34, title: "Health Impacts of Smog", q: "What is the main health danger of wildfire smoke?", opts: { A: "Osteoporosis", B: "Acute Respiratory Infection (ARI / ISPA)", C: "Digestive disorders" }, correct: "B", exp: "Smoke causes acute respiratory infections." },
+            { id: 35, title: "Sasi Scope", q: "In which domains is Sasi practiced?", opts: { A: "Land only", B: "Sea only", C: "Land & Sea" }, correct: "C", exp: "Sasi covers both terrestrial and marine ecosystems." },
+            { id: 36, title: "Fire Prohibitions", q: "Why are campfires prohibited during dry season Sasi?", opts: { A: "Damages leaf coloration", B: "Wind and dry litter easily trigger wildfires", C: "Attracts wild animals" }, correct: "B", exp: "Prevents accidental spark ignition during droughts." },
+            { id: 37, title: "Campers & Sasi", q: "What negative impact arises when tourists disobey Sasi?", opts: { A: "Litter & cigarette butts trigger wildfires", B: "Forest turns into a city", C: "Tree mortality" }, correct: "A", exp: "Careless cigarette disposal causes wildfires." },
+            { id: 38, title: "Taboo Violations", q: "Harvesting forest products while Sasi is active is called?", opts: { A: "Investment", B: "Violating Taboo / Sasi", C: "Preservation" }, correct: "B", exp: "Breaches traditional customary law." },
+            { id: 39, title: "Terrestrial Sasi", q: "Sasi practiced specifically on land areas is known as?", opts: { A: "Sand Sasi", B: "Land Sasi (Sasi Darat)", C: "Sea Sasi" }, correct: "B", exp: "Land Sasi (Sasi Darat)." },
+            { id: 40, title: "Purpose of Close Sasi", q: "What is the primary goal of Closing Sasi (Tutup Sasi)?", opts: { A: "Natural ecosystem recovery", B: "Price monopoly", C: "Chemical contamination" }, correct: "A", exp: "Allows nature to regenerate naturally." }
+        ];
+
+        let playerCount = 4;
+        let players = [];
+        let currentPlayerIdx = 0;
+        let activeCard = null;
+        let activeEventPlus = null;
+        let roundCounter = 1;
+        let totalTeamScore = 0;
+        let environmentHealth = 100;
+        let timerInterval = null;
+        let remainingSeconds = 90;
+        let canTriggerEventPlus = false;
+        let currentExplanationText = "";
+        let currentExplanationTitle = "";
+
+        const PAWN_CLASSES = ['pawn-p1', 'pawn-p2', 'pawn-p3', 'pawn-p4', 'pawn-p5', 'pawn-p6'];
+
+        function setPlayerCount(count) {
+            playerCount = count;
+            [4, 5, 6].forEach(num => {
+                const btn = document.getElementById(`pbtn-${num}`);
+                if (num === count) {
+                    btn.className = "py-2.5 bg-indigo-600 text-white font-bold text-sm rounded-xl border border-indigo-500 shadow-md";
+                } else {
+                    btn.className = "py-2.5 bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm rounded-xl border border-slate-700";
+                }
+            });
+            renderPlayerInputs();
+        }
+
+        function renderPlayerInputs() {
+            const container = document.getElementById('player-inputs-container');
+            container.innerHTML = '';
+            for (let i = 1; i <= playerCount; i++) {
+                container.innerHTML += `
+                    <div class="flex items-center gap-2">
+                        <span class="w-6 h-6 rounded-full ${PAWN_CLASSES[i-1]} border-2 flex items-center justify-center text-[10px] font-black text-white shrink-0">${i}</span>
+                        <input type="text" id="player-name-input-${i}" value="Player ${i}" class="bg-slate-900 border border-slate-700 text-white text-xs font-semibold rounded-xl px-3 py-2 w-full focus:outline-none">
+                    </div>
+                `;
+            }
+        }
+
+        function startGameSession() {
+            let numImpostors = playerCount === 6 ? 2 : 1;
+            let impostorIndices = [];
+            while(impostorIndices.length < numImpostors) {
+                let r = Math.floor(Math.random() * playerCount);
+                if(!impostorIndices.includes(r)) impostorIndices.push(r);
+            }
+
+            let shuffledRoles = [...ROLE_LIST].sort(() => 0.5 - Math.random());
+
+            players = [];
+            for (let i = 0; i < playerCount; i++) {
+                let nameIn = document.getElementById(`player-name-input-${i+1}`).value.trim();
+                players.push({
+                    id: i + 1,
+                    name: nameIn || `Player ${i+1}`,
+                    role: shuffledRoles[i],
+                    isImpostor: impostorIndices.includes(i),
+                    position: "sorong",
+                    eliminated: false
+                });
+            }
+
+            document.getElementById('modal-setup').classList.add('hidden');
+            document.getElementById('gameplay-dashboard').classList.remove('hidden');
+            document.getElementById('top-stats-bar').classList.remove('hidden');
+
+            logActivity("Game started. Pawns placed on precision red map pins.");
+            updateUI();
+            renderMapNodes();
+            renderPlayerPawns();
+            updateRoleSelectModal();
+        }
+
+        function updateRoleSelectModal() {
+            const select = document.getElementById('select-role-player');
+            select.innerHTML = '<option value="-1">-- Choose Your Name --</option>';
+            players.forEach((p, idx) => {
+                select.innerHTML += `<option value="${idx}">${p.name}</option>`;
+            });
+        }
+
+        function openCheckRoleModal() {
+            document.getElementById('modal-check-role').classList.remove('hidden');
+            document.getElementById('select-role-player').value = "-1";
+            document.getElementById('secret-role-display-box').classList.add('hidden');
+        }
+
+        function closeCheckRoleModal() {
+            document.getElementById('modal-check-role').classList.add('hidden');
+        }
+
+        function displaySecretRole() {
+            const idx = parseInt(document.getElementById('select-role-player').value);
+            const box = document.getElementById('secret-role-display-box');
+            if (idx >= 0 && idx < players.length) {
+                const p = players[idx];
+                box.classList.remove('hidden');
+                const badge = document.getElementById('secret-role-badge');
+                const desc = document.getElementById('secret-role-desc');
+                
+                if (p.isImpostor) {
+                    box.className = "p-4 rounded-2xl border border-rose-500/50 bg-rose-950/40 mb-4";
+                    badge.className = "text-xs font-black uppercase mb-1 text-rose-400";
+                    badge.innerText = `ROLE: ${p.role.toUpperCase()} (IMPOSTOR 😈)`;
+                    desc.innerText = "Your goal is to steer the team into WRONG decisions without getting caught!";
+                } else {
+                    box.className = "p-4 rounded-2xl border border-emerald-500/50 bg-emerald-950/40 mb-4";
+                    badge.className = "text-xs font-black uppercase mb-1 text-emerald-400";
+                    badge.innerText = `ROLE: ${p.role.toUpperCase()} (GOOD CITIZEN 😇)`;
+                    desc.innerText = "Work together to make CORRECT decisions & spot the Impostor!";
+                }
+            } else {
+                box.classList.add('hidden');
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('stat-health').innerText = `${environmentHealth}%`;
+            document.getElementById('stat-score').innerText = totalTeamScore;
+            document.getElementById('stat-round').innerText = `${roundCounter} / 6`;
+            document.getElementById('turn-indicator').innerText = `Turn: ${players[currentPlayerIdx].name}`;
+
+            const grid = document.getElementById('players-status-grid');
+            grid.innerHTML = '';
+            players.forEach((p, idx) => {
+                const isTurn = idx === currentPlayerIdx;
+                const locObj = REGION_NODES[p.position] || REGION_NODES['sorong'];
+                grid.innerHTML += `
+                    <div class="bg-slate-900/90 p-2.5 rounded-xl border ${isTurn ? 'border-amber-400 ring-1 ring-amber-400' : 'border-slate-800'} ${p.eliminated ? 'opacity-40' : ''}">
+                        <div class="flex items-center gap-1.5 mb-1">
+                            <span class="w-3.5 h-3.5 rounded-full ${PAWN_CLASSES[idx]} border flex-shrink-0"></span>
+                            <span class="font-bold text-xs text-white truncate">${p.name}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 truncate">${p.role}</div>
+                        <div class="text-[9px] text-amber-400 mt-1 truncate">📍 ${locObj.name}</div>
+                    </div>
+                `;
+            });
+        }
+
+        // RENDER PRECISION RED PINS
+        function renderMapNodes() {
+            const container = document.getElementById('map-pins-container');
+            if (!container) return;
+            container.innerHTML = '';
+
+            Object.values(REGION_NODES).forEach(node => {
+                const pin = document.createElement('div');
+                pin.className = 'absolute w-4 h-4 -ml-2 -mt-2 bg-red-600 border-2 border-white rounded-full shadow-lg z-10 animate-pulse';
+                pin.style.left = `${node.x}%`;
+                pin.style.top = `${node.y}%`;
+                pin.title = node.name;
+                container.appendChild(pin);
+            });
+            renderPlayerPawns();
+        }
+
+        // RENDER STACKED PAWNS AT RED PINS
+        function renderPlayerPawns() {
+            const container = document.getElementById('map-pins-container');
+            document.querySelectorAll('.player-pawn-marker').forEach(el => el.remove());
+
+            players.forEach((p, idx) => {
+                if (p.eliminated) return;
+                const node = REGION_NODES[p.position] || REGION_NODES['sorong'];
+                
+                const angle = (idx / players.length) * 2 * Math.PI;
+                const radius = 7;
+                const offsetX = Math.cos(angle) * radius;
+                const offsetY = Math.sin(angle) * radius;
+
+                const pawn = document.createElement('div');
+                pawn.className = `player-pawn-marker absolute w-5 h-5 rounded-full border-2 flex items-center justify-center text-[9px] font-black text-white shadow-xl transition-all duration-500 z-30 ${PAWN_CLASSES[idx]}`;
+                pawn.style.left = `calc(${node.x}% + ${offsetX}px)`;
+                pawn.style.top = `calc(${node.y}% + ${offsetY}px)`;
+                pawn.innerText = `P${p.id}`;
+                pawn.title = `${p.name} at ${node.name}`;
+
+                container.appendChild(pawn);
+            });
+        }
+
+        // DIRECTED REGION MOVEMENT DICE
+        function rollDiceCurrentPlayer() {
+            let p = players[currentPlayerIdx];
+            if (p.eliminated) {
+                nextTurn();
+                return;
+            }
+
+            let diceRoll = Math.floor(Math.random() * 6) + 1;
+            document.getElementById('dice-box').innerHTML = `<span class="font-black text-amber-400 text-base">${diceRoll}</span>`;
+
+            let currKey = p.position;
+            for (let i = 0; i < diceRoll; i++) {
+                let nodeObj = REGION_NODES[currKey];
+                let connections = nodeObj.connections;
+                currKey = connections[Math.floor(Math.random() * connections.length)];
+            }
+
+            p.position = currKey;
+            let finalLoc = REGION_NODES[currKey];
+            document.getElementById('dice-result-text').innerText = `${finalLoc.name} (${diceRoll} Steps)`;
+
+            logActivity(`${p.name} rolled dice (${diceRoll}) and moved to ${finalLoc.name}.`);
+            renderPlayerPawns();
+            nextTurn();
+        }
+
+        function nextTurn() {
+            currentPlayerIdx = (currentPlayerIdx + 1) % players.length;
+            updateUI();
+        }
+
+        function uploadCustomMapImage(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('map-image').src = e.target.result;
+                    logActivity("Custom map image loaded.");
+                    renderMapNodes();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function triggerEventByNumber() {
+            const num = parseInt(document.getElementById('input-event-number').value);
+            if (isNaN(num) || num < 1 || num > 27) {
+                displayToast("Please enter an event card number between 1 and 27!");
+                return;
+            }
+
+            activeCard = EVENT_CARDS_DATABASE.find(c => c.id === num);
+            if (!activeCard) return;
+
+            document.getElementById('card-event-badge').innerText = `Event Card #${activeCard.id}`;
+            document.getElementById('card-event-loc').innerText = activeCard.locId.toUpperCase();
+            document.getElementById('card-event-title').innerText = activeCard.title;
+            document.getElementById('card-event-story').innerText = activeCard.story;
+            document.getElementById('card-event-impact').innerText = activeCard.impact;
+            document.getElementById('card-event-data').innerText = activeCard.data;
+            document.getElementById('card-event-opinion').innerText = activeCard.opinion;
+
+            document.getElementById('panel-active-event').classList.remove('hidden');
+            logActivity(`Event Card #${activeCard.id} opened.`);
+        }
+
+        function dispatchNearestPionToEvent() {
+            if (!activeCard) return;
+            let p = players[currentPlayerIdx];
+            p.position = activeCard.locId;
+            renderPlayerPawns();
+            updateUI();
+            logActivity(`${p.name} relocated to event scene: ${REGION_NODES[activeCard.locId].name}.`);
+            openDecisionModal();
+        }
+
+        function openDecisionModal() {
+            if (!activeCard) return;
+            document.getElementById('modal-decision').classList.remove('hidden');
+
+            activeCard.options.forEach((opt, idx) => {
+                document.getElementById(`opt-${idx}-text`).innerText = opt.text;
+                document.getElementById(`opt-${idx}-tokens`).innerText = opt.token || "Standard Token";
+            });
+
+            startDecisionTimer();
+        }
+
+        function startDecisionTimer() {
+            clearInterval(timerInterval);
+            remainingSeconds = 90;
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateTimerDisplay();
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    selectDecisionOption(0, true);
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(remainingSeconds / 60);
+            const s = remainingSeconds % 60;
+            document.getElementById('timer-text').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function selectDecisionOption(optionIdx, isTimeout = false) {
+            clearInterval(timerInterval);
+            document.getElementById('modal-decision').classList.add('hidden');
+
+            const selectedOpt = activeCard.options[optionIdx];
+            const isCorrect = selectedOpt.correct && !isTimeout;
+
+            currentExplanationTitle = activeCard.title;
+            currentExplanationText = activeCard.explanation;
+
+            let scoreDiff = 0;
+            let healthDiff = 0;
+
+            if (isCorrect) {
+                scoreDiff = 100;
+                healthDiff = 0;
+                totalTeamScore += scoreDiff;
+                canTriggerEventPlus = false;
+                disableEventPlusTriggerPanel();
+                showRoundResultModal(true, "CORRECT DECISION!", "The team took effective action to extinguish the wildfire.", scoreDiff, healthDiff, false);
+            } else {
+                scoreDiff = -50;
+                healthDiff = -15;
+                totalTeamScore += scoreDiff;
+                environmentHealth = Math.max(0, environmentHealth + healthDiff);
+                canTriggerEventPlus = true;
+                enableEventPlusTriggerPanel();
+                
+                let desc = isTimeout ? 
+                    "TIME EXPIRED! The team delayed decision-making, allowing wildfire to spread rapidly. Plus Event Card UNLOCKED!" : 
+                    "Suboptimal action! Environmental health reduced. Plus Event Card UNLOCKED.";
+                
+                showRoundResultModal(false, "INCORRECT DECISION!", desc, scoreDiff, healthDiff, isTimeout);
+            }
+            updateUI();
+        }
+
+        function enableEventPlusTriggerPanel() {
+            const panel = document.getElementById('panel-event-plus-trigger');
+            panel.classList.remove('opacity-50', 'pointer-events-none');
+        }
+
+        function disableEventPlusTriggerPanel() {
+            const panel = document.getElementById('panel-event-plus-trigger');
+            panel.classList.add('opacity-50', 'pointer-events-none');
+        }
+
+        function triggerEventPlusByNumber() {
+            if (!canTriggerEventPlus) {
+                displayToast("Plus Event Cards are unlocked ONLY when the team makes a WRONG decision!");
+                return;
+            }
+            const num = parseInt(document.getElementById('input-event-plus-number').value);
+            if (isNaN(num) || num < 28 || num > 40) {
+                displayToast("Please enter a Plus Event Card number between 28 and 40!");
+                return;
+            }
+
+            activeEventPlus = EVENT_PLUS_DATABASE.find(ep => ep.id === num);
+            if (!activeEventPlus) return;
+
+            document.getElementById('event-plus-wrong-indicator').classList.add('hidden');
+            document.getElementById('event-plus-title').innerText = activeEventPlus.title;
+            document.getElementById('event-plus-question').innerText = activeEventPlus.q;
+            
+            document.getElementById('ep-opt-a').innerText = `A. ${activeEventPlus.opts.A}`;
+            document.getElementById('ep-opt-b').innerText = `B. ${activeEventPlus.opts.B}`;
+            document.getElementById('ep-opt-c').innerText = `C. ${activeEventPlus.opts.C}`;
+
+            document.getElementById('modal-event-plus').classList.remove('hidden');
+        }
+
+        function answerEventPlus(selectedChoice) {
+            if (!activeEventPlus) return;
+
+            if (selectedChoice === activeEventPlus.correct) {
+                document.getElementById('modal-event-plus').classList.add('hidden');
+                canTriggerEventPlus = false;
+                disableEventPlusTriggerPanel();
+
+                let impostors = players.filter(p => p.isImpostor && !p.eliminated);
+                let targetRole = "Unknown";
+                if (impostors.length > 0) {
+                    let randImp = impostors[Math.floor(Math.random() * impostors.length)];
+                    targetRole = randImp.role;
+                } else {
+                    targetRole = ROLE_LIST[Math.floor(Math.random() * ROLE_LIST.length)];
+                }
+
+                let clues = CLUE_DATABASE[targetRole] || ["Traditional Law", "Conservation", "Duty"];
+                let randomClueWord = clues[Math.floor(Math.random() * clues.length)];
+
+                document.getElementById('clue-text-content').innerText = `Clue word associated with the Impostor's role: "${randomClueWord}"`;
+                document.getElementById('modal-clue-display').classList.remove('hidden');
+                logActivity(`Plus Event answered correctly! Impostor clue word unlocked: "${randomClueWord}".`);
+            } else {
+                const indicator = document.getElementById('event-plus-wrong-indicator');
+                const text = document.getElementById('event-plus-wrong-text');
+                indicator.classList.remove('hidden');
+                text.innerText = `Explanation: ${activeEventPlus.exp}`;
+                logActivity(`Incorrect Plus Event answer!`);
+            }
+        }
+
+        function closeEventPlusModal() {
+            document.getElementById('modal-event-plus').classList.add('hidden');
+        }
+
+        function closeClueModal() {
+            document.getElementById('modal-clue-display').classList.add('hidden');
+        }
+
+        function showRoundResultModal(isSuccess, title, desc, sDiff, hDiff, isTimeout = false) {
+            const modal = document.getElementById('modal-round-result');
+            const iconBox = document.getElementById('result-icon-box');
+            const timeoutBadge = document.getElementById('timeout-result-badge');
+
+            if (isTimeout) {
+                timeoutBadge.classList.remove('hidden');
+            } else {
+                timeoutBadge.classList.add('hidden');
+            }
+
+            if (isSuccess) {
+                iconBox.className = "w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center justify-center text-3xl mb-3";
+                iconBox.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+            } else {
+                iconBox.className = "w-16 h-16 rounded-full bg-rose-500/20 text-rose-400 border border-rose-500/30 flex items-center justify-center text-3xl mb-3";
+                iconBox.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+            }
+
+            document.getElementById('result-title').innerText = title;
+            document.getElementById('result-desc').innerText = desc;
+            document.getElementById('res-score-diff').innerText = `${sDiff >= 0 ? '+' : ''}${sDiff}`;
+            document.getElementById('res-health-diff').innerText = `${hDiff}%`;
+
+            modal.classList.remove('hidden');
+        }
+
+        function openExplanationModal() {
+            document.getElementById('exp-title').innerText = currentExplanationTitle;
+            document.getElementById('exp-content').innerText = currentExplanationText;
+            document.getElementById('modal-explanation').classList.remove('hidden');
+        }
+
+        function closeExplanationModal() {
+            document.getElementById('modal-explanation').classList.add('hidden');
+        }
+
+        function proceedFromRoundResult() {
+            document.getElementById('modal-round-result').classList.add('hidden');
+            if (roundCounter === 3 || roundCounter === 5 || roundCounter === 6) {
+                openVotingModal();
+            } else {
+                advanceRound();
+            }
+        }
+
+        function openVotingModal() {
+            document.getElementById('voting-round-title').innerText = `Round ${roundCounter} Voting Phase`;
+            document.getElementById('voting-wrong-indicator').classList.add('hidden');
+            const grid = document.getElementById('voting-candidates-grid');
+            grid.innerHTML = '';
+
+            players.forEach((p, idx) => {
+                if (p.eliminated) return;
+                grid.innerHTML += `
+                    <button onclick="votePlayer(${idx})" class="p-3 bg-slate-900 hover:bg-rose-950 border border-slate-700 hover:border-rose-500 rounded-2xl flex flex-col items-center transition group shadow-md">
+                        <span class="w-8 h-8 rounded-full ${PAWN_CLASSES[idx]} border-2 flex items-center justify-center text-xs font-black text-white mb-2">P${p.id}</span>
+                        <span class="font-bold text-xs text-white group-hover:text-rose-300 truncate w-full text-center">${p.name}</span>
+                        <span class="text-[9px] text-slate-400 truncate">${p.role}</span>
+                    </button>
+                `;
+            });
+
+            document.getElementById('modal-voting').classList.remove('hidden');
+        }
+
+        function votePlayer(votedIdx) {
+            const p = players[votedIdx];
+            if (!p) return;
+
+            if (p.isImpostor) {
+                p.eliminated = true;
+                logActivity(`ACUSATION SUCCESSFUL! ${p.name} (${p.role}) WAS AN IMPOSTOR 😈 and has been eliminated!`);
+                document.getElementById('modal-voting').classList.add('hidden');
+                
+                let remainingImpostors = players.filter(x => x.isImpostor && !x.eliminated);
+                if (remainingImpostors.length === 0) {
+                    endGameSession(true);
+                    return;
+                }
+                advanceRound();
+            } else {
+                const indicator = document.getElementById('voting-wrong-indicator');
+                const text = document.getElementById('voting-wrong-text');
+                indicator.classList.remove('hidden');
+                text.innerText = `${p.name} is NOT an Impostor! Environmental Health decreases by 10%.`;
+                
+                environmentHealth = Math.max(0, environmentHealth - 10);
+                updateUI();
+                logActivity(`WRONG GUESS! ${p.name} is an innocent Citizen.`);
+            }
+        }
+
+        function skipVotingRound() {
+            document.getElementById('modal-voting').classList.add('hidden');
+            logActivity(`Voting phase skipped for Round ${roundCounter}.`);
+            advanceRound();
+        }
+
+        function advanceRound() {
+            if (roundCounter >= 6 || environmentHealth <= 0) {
+                endGameSession(false);
+                return;
+            }
+            roundCounter++;
+            document.getElementById('panel-active-event').classList.add('hidden');
+            activeCard = null;
+            updateUI();
+            logActivity(`Advanced to Round ${roundCounter}.`);
+        }
+
+        function endGameSession(allImpostorsEliminated = false) {
+            document.getElementById('modal-game-over').classList.remove('hidden');
+            document.getElementById('final-score-val').innerText = totalTeamScore;
+            document.getElementById('final-health-val').innerText = `${environmentHealth}%`;
+
+            let impList = players.filter(p => p.isImpostor).map(p => `${p.name} (${p.role})`).join(', ');
+            document.getElementById('final-impostor-list').innerText = impList || 'None';
+
+            logActivity("Game Over evaluation completed.");
+        }
+
+        function resetGameToSetup() {
+            roundCounter = 1;
+            totalTeamScore = 0;
+            environmentHealth = 100;
+            activeCard = null;
+            activeEventPlus = null;
+
+            document.getElementById('modal-game-over').classList.add('hidden');
+            document.getElementById('gameplay-dashboard').classList.add('hidden');
+            document.getElementById('top-stats-bar').classList.add('hidden');
+            document.getElementById('modal-setup').classList.remove('hidden');
+            setPlayerCount(4);
+        }
+
+        function logActivity(text) {
+            const logBox = document.getElementById('activity-log');
+            if (logBox) {
+                logBox.innerHTML += `<p>[${new Date().toLocaleTimeString()}] ${text}</p>`;
+                logBox.scrollTop = logBox.scrollHeight;
+            }
+        }
+
+        function displayToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-5 right-5 bg-rose-600 text-white font-bold text-xs px-4 py-3 rounded-2xl shadow-2xl z-50 animate-bounce';
+            toast.innerText = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        window.onload = function() {
+            setPlayerCount(4);
+        };
+    </script>
+</body>
+</html>
