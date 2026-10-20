@@ -1,0 +1,18 @@
+{
+  "background_color": "#ffffff",
+  "dir": "ltr",
+  "display": "standalone",
+  "name": "Southwest Papua Wildfire Board Game",
+  "orientation": "any",
+  "scope": "/",
+  "short_name": "Wildfire Game🎲",
+  "start_url": "/",
+  "theme_color": "#ffffff",
+  "id": "com.wildfiregame.papua",
+  "description": "Game edukasi simulasi mitigasi kebakaran hutan Papua Barat Daya.",
+  "lang": "en",
+  "categories": [
+    "education",
+    "games"
+  ]
+}
